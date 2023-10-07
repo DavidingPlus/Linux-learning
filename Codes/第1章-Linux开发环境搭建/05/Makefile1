@@ -1,0 +1,5 @@
+a.out:add.c sub.c mult.c div.c main.c
+	gcc add.c sub.c mult.c div.c main.c -o a.out
+
+clean:*.o a.out
+	rm *.o a.out

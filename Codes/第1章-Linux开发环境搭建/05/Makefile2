@@ -1,0 +1,20 @@
+a.out:add.o sub.o mult.o div.o main.o
+	gcc add.o sub.o mult.o div.o main.o -o a.out
+
+add.o:add.c
+	gcc -c add.c
+
+sub.o:sub.c
+	gcc -c sub.c
+
+mult.o:mult.c
+	gcc -c mult.c
+
+div.o:div.c
+	gcc -c div.c
+
+main.o:main.c
+	gcc -c main.c
+
+clean:*.o a.out
+	rm *.o a.out
