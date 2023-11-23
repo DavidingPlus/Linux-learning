@@ -9,15 +9,16 @@
 #include <vector>
 
 int main() {
-    // std::string path = "/img/PCtm_d9c8750bed0b3c7d089fa7d55720d6cf.png";
-    std::string path = "/";
-    std::string host = "www.baidu.com";
+    // std::string path = "/";
+    std::string path = "/image";
+    std::string host = "106.55.60.140";
+    int port = 8081;
 
     std::string send_message = "GET " + path + " HTTP/1.1\r\n";
     send_message += "Host: " + host + "\r\n";
     send_message += "Connection: keep-alive\r\n";
     // send_message += "User-Agent: Mozilla/5.0\r\n";
-    send_message += "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6\r\n";
+    // send_message += "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6\r\n";
     send_message += "\r\n";
 
     int connect_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
@@ -31,7 +32,7 @@ int main() {
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
     memcpy(&(server_addr.sin_addr), p_hostent->h_addr_list[0], sizeof(server_addr.sin_addr));
-    server_addr.sin_port = htons(80);
+    server_addr.sin_port = htons(port);
 
     int ret = connect(connect_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
     if (-1 == ret) {
@@ -100,24 +101,24 @@ int main() {
             break;  // 服务端关闭了...
     }
 
-    std::cout << std_readMessage << std::endl;
+    // std::cout << std_readMessage << std::endl;
     std::cout << "Received data size: " << std_readMessage.size() << " bytes" << std::endl;
 
     // 将数据部分从std_readMessage中提取出来
-    // std::string data_str = std_readMessage.substr(data_start, data_end - data_start);
+    std::string data_str = std_readMessage.substr(data_start, data_end - data_start);
 
-    // // 将数据部分写入文件
-    // FILE *file = fopen("image.jpg", "w+");
-    // if (nullptr == file) {
-    //     perror("fopen");
-    //     return -1;
-    // }
+    // 将数据部分写入文件
+    FILE *file = fopen("image.jpg", "w+");
+    if (nullptr == file) {
+        perror("fopen");
+        return -1;
+    }
 
-    // fwrite(data_str.c_str(), 1, data_str.size(), file);
+    fwrite(data_str.c_str(), 1, data_str.size(), file);
 
-    // fclose(file);
+    fclose(file);
 
-    // std::cout << "Image saved to image.jpg" << std::endl;
+    std::cout << "Image saved to image.jpg" << std::endl;
 
     close(connect_fd);
 
