@@ -17,6 +17,7 @@ int main() {
     std::string send_message = "GET " + path + " HTTP/1.1\r\n";
     send_message += "Host: " + host + "\r\n";
     send_message += "Connection: keep-alive\r\n";
+    send_message += "Content-Type: image/jpeg\r\n";
     // send_message += "User-Agent: Mozilla/5.0\r\n";
     // send_message += "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6\r\n";
     send_message += "\r\n";
@@ -108,7 +109,7 @@ int main() {
     std::string data_str = std_readMessage.substr(data_start, data_end - data_start);
 
     // 将数据部分写入文件
-    FILE *file = fopen("image.jpg", "w+");
+    FILE *file = fopen("image.jpeg", "w+");
     if (nullptr == file) {
         perror("fopen");
         return -1;
