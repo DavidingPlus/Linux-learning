@@ -12,8 +12,10 @@
 #include <iostream>
 
 // 通过非阻塞和select函数来进行处理超时的问题
-int main(int argc, char **argv) {
-    if (argc < 3) {
+int main(int argc, char **argv)
+{
+    if (argc < 3)
+    {
         printf("please input ip and port, for example ./main 120.12.34.56 80.\n");
         return -1;
     }
@@ -29,7 +31,8 @@ int main(int argc, char **argv) {
     int errlen = sizeof(err);
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0) {
+    if (fd < 0)
+    {
         fprintf(stderr, "create socket failed,error:%s.\n", strerror(errno));
         return -1;
     }
@@ -41,13 +44,15 @@ int main(int argc, char **argv) {
 
     /*设置套接字为非阻塞*/
     int flags = fcntl(fd, F_GETFL, 0);
-    if (flags < 0) {
+    if (flags < 0)
+    {
         fprintf(stderr, "Get flags error:%s\n", strerror(errno));
         close(fd);
         return -1;
     }
     flags |= O_NONBLOCK;
-    if (fcntl(fd, F_SETFL, flags) < 0) {
+    if (fcntl(fd, F_SETFL, flags) < 0)
+    {
         fprintf(stderr, "Set flags error:%s\n", strerror(errno));
         close(fd);
         return -1;
@@ -55,8 +60,10 @@ int main(int argc, char **argv) {
 
     /*阻塞情况下linux系统默认超时时间为75s*/
     int rc = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
-    if (rc != 0) {
-        if (errno == EINPROGRESS) {
+    if (rc != 0)
+    {
+        if (errno == EINPROGRESS)
+        {
             printf("Doing connection.\n");
             /*正在处理连接*/
             FD_ZERO(&fdr);
@@ -68,20 +75,23 @@ int main(int argc, char **argv) {
             rc = select(fd + 1, &fdr, &fdw, NULL, &timeout);
             printf("rc is: %d\n", rc);
             /*select调用失败*/
-            if (rc < 0) {
+            if (rc < 0)
+            {
                 fprintf(stderr, "connect error:%s\n", strerror(errno));
                 close(fd);
                 return -1;
             }
 
             /*连接超时*/
-            if (rc == 0) {
+            if (rc == 0)
+            {
                 fprintf(stderr, "Connect timeout.\n");
                 close(fd);
                 return -1;
             }
             /*[1] 当连接成功建立时，描述符变成可写,rc=1*/
-            if (rc == 1 && FD_ISSET(fd, &fdw)) {
+            if (rc == 1 && FD_ISSET(fd, &fdw))
+            {
                 printf("Connect success\n");
                 close(fd);
                 return 0;

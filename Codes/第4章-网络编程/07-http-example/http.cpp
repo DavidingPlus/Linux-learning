@@ -8,7 +8,8 @@
 #include <string>
 #include <vector>
 
-int main() {
+int main()
+{
     // std::string path = "/";
     std::string path = "/image";
     std::string host = "106.55.60.140";
@@ -23,7 +24,8 @@ int main() {
     send_message += "\r\n";
 
     int connect_fd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-    if (-1 == connect_fd) {
+    if (-1 == connect_fd)
+    {
         perror("socket");
         return -1;
     }
@@ -36,7 +38,8 @@ int main() {
     server_addr.sin_port = htons(port);
 
     int ret = connect(connect_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-    if (-1 == ret) {
+    if (-1 == ret)
+    {
         perror("connect");
         return -1;
     }
@@ -49,41 +52,48 @@ int main() {
     std::string std_readMessage;
 
     // 定义一些数据，在下面需要用到
-    size_t data_start = 0;               // 响应体的开头下标
-    size_t data_end = 0;                 // 响应体的结束下标
-    size_t content_length = 0;           // 响应体的长度
-    bool is_Location_in_header = false;  // url是否进行了重定向
-    int count = 0;                       // 计数，为了提高效率
+    size_t data_start = 0;              // 响应体的开头下标
+    size_t data_end = 0;                // 响应体的结束下标
+    size_t content_length = 0;          // 响应体的长度
+    bool is_Location_in_header = false; // url是否进行了重定向
+    int count = 0;                      // 计数，为了提高效率
 
     // 我换了一个算法，能读取到全部的数据，就是缓冲区满了需要多次读取的时候
-    while (1) {
+    while (1)
+    {
         bzero(readBuffer, BUFSIZ);
         int len = recv(connect_fd, readBuffer, BUFSIZ - 1, 0);
-        if (-1 == len) {
+        if (-1 == len)
+        {
             perror("recv");
             exit(-1);
         }
-        if (len > 0) {
+        if (len > 0)
+        {
             std_readMessage.insert(std_readMessage.end(), readBuffer, readBuffer + len);
 
-            if (0 == count) {
+            if (0 == count)
+            {
                 // 检查收到的数据是否完整包含了响应头，这一步骤只进行一次，目的是为了得到响应的数据
                 size_t headers_end = std_readMessage.find("\r\n\r\n");
-                if (std::string::npos != headers_end) {
+                if (std::string::npos != headers_end)
+                {
                     // 下一次就不进来了，写在这也可以保证如果第一次没有完整读到响应头，也能从这里进来并且下一次就不进来了
                     ++count;
                     // 注意substr第一个参数是子串的开始位置，第二个参数是字串的长度
                     std::string headers = std_readMessage.substr(0, headers_end);
 
                     // 查看是否有重定向存在
-                    if (!is_Location_in_header) {
+                    if (!is_Location_in_header)
+                    {
                         size_t location_pos = headers.find("Location:");
                         if (std::string::npos != location_pos)
                             is_Location_in_header = true;
                     }
 
                     size_t content_length_pos = headers.find("Content-Length:");
-                    if (std::string::npos != content_length_pos) {
+                    if (std::string::npos != content_length_pos)
+                    {
                         size_t content_length_end = headers.find("\r\n", content_length_pos);
 
                         content_length = atoi(headers.substr(content_length_pos + strlen("Content-Length: "), content_length_end - content_length_pos - strlen("Content-Length: ")).c_str());
@@ -98,8 +108,9 @@ int main() {
             // 得到了所有的数据，循环结束
             if (std_readMessage.size() - data_start >= content_length)
                 break;
-        } else if (0 == len)
-            break;  // 服务端关闭了...
+        }
+        else if (0 == len)
+            break; // 服务端关闭了...
     }
 
     std::cout << "Received data size: " << std_readMessage.size() << " bytes" << std::endl
@@ -113,7 +124,8 @@ int main() {
 
     // 将数据部分写入文件
     FILE *file = fopen("image.png", "w+");
-    if (nullptr == file) {
+    if (nullptr == file)
+    {
         perror("fopen");
         return -1;
     }
